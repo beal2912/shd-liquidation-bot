@@ -3,7 +3,7 @@
 /build
 index.js
 .DS_Store
-.env*
+.env
 yarn-error.log
 proto-ts.tar.gz
 *.log
