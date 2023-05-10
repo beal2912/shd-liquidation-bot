@@ -80,7 +80,7 @@ require('dotenv').config();
     let scrtBalance = await getPublicBalance(secretjs, 'uscrt', signer.address)
     log.info("Your address: "+signer.address)
     log.info("scrt: "+scrtBalance)
-    if(scrtBalance > 0.5){
+    if(scrtBalance < 0.5){
         log.info("You need some secret token in your wallet for Gas Fee")
         await delay(2000)
         process.exit(0)
