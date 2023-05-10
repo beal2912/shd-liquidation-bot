@@ -1,0 +1,33 @@
+{
+  "name": "shd-liquidation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "dependencies": {
+    "@cosmjs/cosmwasm-stargate": "^0.29.5",
+    "@cosmjs/proto-signing": "^0.29.5",
+    "@cosmjs/stargate": "^0.29.5",
+    "@types/ws": "^8.5.4",
+    "bignumber.js": "^9.1.0",
+    "bip39": "^3.0.4",
+    "dotenv": "^16.0.3",
+    "lodash": "^4.17.21",
+    "secretjs": "^1.8.1",
+    "tslog": "^3.3.4",
+    "ws": "^8.12.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.189",
+    "@types/node": "^18.11.9",
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "nodemon"
+  },
+  "keywords": [],
+  "author": "beal2912",
+  "license": "ISC"
+}

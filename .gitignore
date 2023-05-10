@@ -1,0 +1,11 @@
+/node_modules
+/lib
+/build
+index.js
+.DS_Store
+.env*
+yarn-error.log
+proto-ts.tar.gz
+*.log
+package-lock.json
+*.out
