@@ -12,6 +12,7 @@ Afer that the bot check each balance and if a min amount of token is match, it e
 If you don't want to swap the token you can disable it in the .env conf file.
 
 
+
 # Prerequis
 
 this bot was tested on Ubuntu 22.04.2 LTS with npm 8.19.3 and Node v19.1.0.
@@ -29,7 +30,7 @@ cd <your dir>
 git clone git@github.com:beal2912/shd-liquidation-bot.git .
 ```
 
-2. install the node dependency 
+2. install the node dependencies 
 ```
 npm install
 ```
@@ -65,7 +66,7 @@ The viewing keys can be generated on the shade app by viewing your balance of ea
 You also can retrieve it in Keplr (Secret Network > setting > tokens list)
 
 
-To disable the swap function : just remove the min_amount field with the comma before to keep a valid json text.
+To disable the swap function : just remove the min_amount field for ==each token== with the comma before to keep a valid json text.
 ```
 TOKENLIST='{ "tokens": [
                 { 
