@@ -4,7 +4,7 @@ import { log } from "./botlib/Logger"
 import { Error } from "./botlib/Error";
 
 
-
+require('dotenv').config();
 
 export interface Vault{
     id: string,
@@ -13,6 +13,9 @@ export interface Vault{
     contract: string,
     codehash: string,
 }
+
+
+const gasprice = process.env.GASPRICE ?? "0.0125"
 
 
 export async function queryVaultForLiquidation(secretjs: SecretNetworkClient,vault: Vault):Promise<any>{
@@ -59,7 +62,7 @@ export async function liquidatePosition(secretjs: SecretNetworkClient, sender: s
         })
         let resp = await secretjs.tx.broadcast([msg], {
             gasLimit: 1_000_000,
-            gasPriceInFeeDenom: 0.0125,
+            gasPriceInFeeDenom: Number(gasprice),
             feeDenom: "uscrt",
         })
         return resp

@@ -11,8 +11,6 @@ import { Token, getPublicBalance, getUpdatedSecretBalance } from "./SecretWallet
 import { executeTrade, getRouteList, simulateBestSwap } from "./SecretTrade";
 
 
-
-const fs = require('fs');
 require('dotenv').config();
 
 
