@@ -15,7 +15,34 @@ export interface Vault{
 }
 
 
+export async function queryVaultForLiquidation(secretjs: SecretNetworkClient,vault: Vault):Promise<any>{
+    try{
+        let result: any = await secretjs.query.compute.queryContract({
+            contract_address: vault.contract,
+            code_hash: vault.codehash,
+            query: { 
+                liquidatable_positions: { vault_id: vault.id }
+            }
+        }) 
+        return result
 
+    }
+    catch(e: any){
+        log.info("Exception queryVaultForLiquidation : "+ e.message)
+        let error = new Error(e)
+        if(error.isKo() || error.isNotSure()){
+            log.info("Rpc Error or timeout, let's retry the liquidation ")
+            return await queryVaultForLiquidation(secretjs,vault)
+        }
+        else{
+            log.info("Unknown error, perhaps functionnal")
+        }
+
+    }
+
+
+
+}
 
 export async function liquidatePosition(secretjs: SecretNetworkClient, sender: string, vault: Vault, positionId: string ):Promise<TxResponse|undefined>{
     try{
@@ -50,3 +77,5 @@ export async function liquidatePosition(secretjs: SecretNetworkClient, sender: s
 
     }
 }
+
+

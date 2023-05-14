@@ -6,7 +6,7 @@ import { log } from "./botlib/Logger";
 
 import * as BIP39 from "bip39";
 
-import { Vault, liquidatePosition } from "./ShadeLiquidation";
+import { Vault, liquidatePosition, queryVaultForLiquidation } from "./ShadeLiquidation";
 import { Token, getPublicBalance, getUpdatedSecretBalance } from "./SecretWallet";
 import { executeTrade, getRouteList, simulateBestSwap } from "./SecretTrade";
 
@@ -98,14 +98,9 @@ require('dotenv').config();
 
         for(let vault of vaultList){
             
-            let result: any = await secretjs.query.compute.queryContract({
-                contract_address: vault.contract,
-                code_hash: vault.codehash,
-                query: { 
-                    liquidatable_positions: { vault_id: vault.id }
-                }
-            }) 
+            let result = await queryVaultForLiquidation(secretjs,vault)
             log.info(vault.name + " -> "+result.positions.length)
+            
             if(result.positions.length > 0){
                 log.info("nb position to liquidate: "+ result.positions.length)
                 for(let position of result.positions){

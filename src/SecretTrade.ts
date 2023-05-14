@@ -69,9 +69,9 @@ export async function simulateBestSwap(client: SecretNetworkClient, routeList: R
 
 async function simulateShadeSwap(client: SecretNetworkClient, route: Route, tokenIn: Token, tokenOut: Token, amount: number): Promise<number> {
     
-    let path: {addr:string,codehash:string}[] = []
+    let path: {addr:string,code_hash:string}[] = []
     for(let step of route.marketPath){
-        path.push({addr: step.contract,codehash: step.codeHash ?? ""})
+        path.push({addr: step.contract,code_hash: step.codeHash ?? ""})
     }
 
     try{
