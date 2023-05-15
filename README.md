@@ -12,6 +12,26 @@ Afer that the bot check each balance and if a min amount of token is match, it e
 If you don't want to swap the token you can disable it in the .env conf file.
 
 
+## Development Deepdive
+
+To develop this project I choose a very simple design pattern so the functions and the strategy is easily readable by any developer. 
+The main process of the bot is in the index.ts and you have a file for each group of functions, 
+* the secret wallet to query balances, 
+* the trades/simulation on shade swap to transform the reward into $SILK, 
+* the shade liquidation to query and liquidate
+
+You have class / interface for more generic function like to calculate a valid swap path using the shade swap pools and managing the rpc errors.
+these classes could easily be used for more complex arbitrage bot and other dapps like Sienna and SecretSwap.
+
+while coding this bot I kept in mind to optimize memory / cpu / maintainability : 
+* limiting the number of dependencies
+* limiting the number and size of classes
+* limiting the number of requests on the network
+
+what could be improved in future versions:
+* finding a better strategy to request less the vault, I could think of a gradient one, where we change the frequency of the request, when price are going down we request more and when price are going up we request less 
+
+
 
 # Prerequis
 

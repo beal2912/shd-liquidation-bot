@@ -15,7 +15,7 @@ export interface Vault{
 }
 
 
-const gasprice = process.env.GASPRICE ?? "0.0125"
+const gasprice = process.env.GASPRICE ?? "0.1"
 
 
 export async function queryVaultForLiquidation(secretjs: SecretNetworkClient,vault: Vault):Promise<any>{

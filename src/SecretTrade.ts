@@ -14,7 +14,7 @@ import { delay } from "./botlib/utils";
 
 require('dotenv').config();
 
-const gasprice = process.env.GASPRICE ?? "0.0125"
+const gasprice = process.env.GASPRICE ?? "0.1"
 
 
 interface RouterList{
