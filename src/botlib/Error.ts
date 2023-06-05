@@ -13,17 +13,41 @@ export const errorKoList: string[] =[
     "Request failed with status code 524",
     "Bad status on response: 524",
     "incorrect account sequence",
+    "account sequence mismatch",
+    "Failed to broadcast transaction",
+    "invalid json response",
+    "Unexpected end of JSON",
+    "failed to load cache multi store",
+    "recovered: UnmarshalJSON cannot decode empty bytes",
+    "signature verification failed",
+    "insufficient fees",
+    "mempool is full",
+    "unknown address",
 ]
+
 export const errorNeedCheckList: string[] =[
     "ECONNRESET",
+    "connect ETIMEDOUT",
     "Request failed with status code 429",
     "Bad status on response: 429",
     "Request failed with status code 520",
     "Bad status on response: 520",
     "was submitted but was not yet found on the chain",
+    "tx not found",
+    "key not found",
 ]
+
+export const errorNeedRpcChange: string[] =[
+    "Request failed with status code 429",
+    "Bad status on response: 429",
+    "Request failed with status code 520",
+    "Bad status on response: 520",
+    "getaddrinfo ENOTFOUND",
+]
+
 export const timeoutList: string[] =[
     "was submitted but was not yet found on the chain",
+    "tx not found",
 ]
 
 export const errorAbortList: string[] =[
@@ -44,6 +68,14 @@ export class Error{
 
     isKo(){
         for(let error of errorKoList){
+            if(this.exception.message.includes(error)){
+                return true
+            }
+        }
+        return false
+    }
+    needRpcChange(){
+        for(let error of errorNeedRpcChange){
             if(this.exception.message.includes(error)){
                 return true
             }
