@@ -9,3 +9,4 @@ proto-ts.tar.gz
 *.log
 package-lock.json
 *.out
+*.sh

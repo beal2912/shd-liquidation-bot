@@ -12,8 +12,7 @@ import { executeTrade, getRouteList, simulateBestSwap } from "./SecretTrade";
 
 
 require('dotenv').config();
-
-
+process.chdir(__dirname);
 
 
 (async () => {
