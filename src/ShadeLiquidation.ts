@@ -66,7 +66,7 @@ export async function liquidatePosition(secretjs: SecretNetworkClient, sender: s
             },
         })
         let resp = await secretjs.tx.broadcast([msg], {
-            gasLimit: 1_000_000,
+            gasLimit: 750_000,
             gasPriceInFeeDenom: Number(gasprice),
             feeDenom: "uscrt",
         })
@@ -107,7 +107,7 @@ export async function liquidateBatchPosition(secretjs: SecretNetworkClient, send
         }
         
         let resp = await secretjs.tx.broadcast(msgList, {
-            gasLimit: 1_000_000,
+            gasLimit: 750_000 * msgList.length,
             gasPriceInFeeDenom: Number(gasprice),
             feeDenom: "uscrt",
         })

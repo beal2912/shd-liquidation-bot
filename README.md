@@ -4,6 +4,14 @@ this typescript bot executes liquidations on Shade Lend then execute a swap on s
 
 It does not cost anything except SCRT gas to execute liquidations, and you receive 10% of the profits of all liquidations as a reward for liquidation risky positions and contributing to the security and decentralization of the protocol.
 
+## Changelog
+- 2023-06-08: 
+  - Using websocket to resquest vaults once per block 
+  - Resqueting the vault in parallel instead of sequentially
+  - Broadcasting a batch liquidations in case of multiple liquidation in a block
+
+- 2023-05-15: first public version (HackSecret submission)
+
 ## Strategy
 The strategy is quite basic, the bot load the vault ids at start then it request every x seconds if there is liquidatable positions on each vault.
 If a liquidable position is found, the bot execute the contract to liquidate and receive the reward.
