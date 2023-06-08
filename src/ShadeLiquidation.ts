@@ -14,6 +14,11 @@ export interface Vault{
     codehash: string,
 }
 
+export interface Position{
+    vault: Vault,
+    id: string,
+}
+
 
 const gasprice = process.env.GASPRICE ?? "0.1"
 
@@ -73,6 +78,47 @@ export async function liquidatePosition(secretjs: SecretNetworkClient, sender: s
         if(error.isKo() || error.isNotSure()){
             log.info("Rpc Error or timeout, let's retry the liquidation ")
             return await liquidatePosition(secretjs, sender, vault, positionId)
+        }
+        else{
+            log.info("Unknown error, perhaps functionnal")
+        }
+
+    }
+}
+
+export async function liquidateBatchPosition(secretjs: SecretNetworkClient, sender: string, batch: Position[] ):Promise<TxResponse|undefined>{
+    try{
+
+        let msgList: any[] = []
+        
+        for(let position of batch){
+            let msg = new MsgExecuteContract({
+                sender: sender,
+                contract_address: position.vault.contract,
+                code_hash: position.vault.codehash,
+                msg: { 
+                    liquidate: {
+                        vault_id: position.vault.id,
+                        position_id: position.id,
+                    }    
+                },
+            })
+            msgList.push(msg)
+        }
+        
+        let resp = await secretjs.tx.broadcast(msgList, {
+            gasLimit: 1_000_000,
+            gasPriceInFeeDenom: Number(gasprice),
+            feeDenom: "uscrt",
+        })
+        return resp
+    }
+    catch(e: any){
+        log.info("Exception liquidatePosition : "+ e.message)
+        let error = new Error(e)
+        if(error.isKo() || error.isNotSure()){
+            log.info("Rpc Error or timeout, let's retry the liquidation ")
+            return await liquidateBatchPosition(secretjs, sender, batch)
         }
         else{
             log.info("Unknown error, perhaps functionnal")
