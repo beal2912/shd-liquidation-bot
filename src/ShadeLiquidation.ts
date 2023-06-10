@@ -44,6 +44,7 @@ export async function queryVaultForLiquidation(secretjs: SecretNetworkClient,vau
         }
         else{
             log.info("Unknown error, perhaps functionnal")
+            return {positions: []}
         }
 
     }

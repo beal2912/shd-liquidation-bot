@@ -21,6 +21,8 @@ require('dotenv').config();
     var connexionClosed = false
     var isConnected = false
     var ws =  {} as WebSocket
+    var liquidationFlag = false
+
 
     log.info("Init loading Vaults..")
     log.info("=======================================================")
@@ -110,56 +112,61 @@ require('dotenv').config();
     var onMessage = async function(event: any) {
         log.info("Checking for liquidation")
 
-        const promises = vaultList.map(async (vault) => {
-            const result = await queryVaultForLiquidation(secretjs, vault)
-            log.info(vault.name + " -> " + result.positions.length)
-            return { vault, result }
-        })
-        const results = await Promise.all(promises)
+        if(!liquidationFlag){
+            const promises = vaultList.map(async (vault) => {
+                let result = await queryVaultForLiquidation(secretjs, vault)
+                
+                log.info(vault.name + " -> " + result.positions.length)
+                return { vault, result }
+            })
+            const results = await Promise.all(promises)
 
-        let positionToLiquidate: Position[] = []
-        for (const { vault, result } of results) {
-            if(result.positions.length > 0){
-                for (const position of result.positions) {
-                    log.info("liquidation to execute on vault: " + vault.name + " position id: " + position.position_id)
-                    positionToLiquidate.push({vault: vault, id: position.position_id})
+            let positionToLiquidate: Position[] = []
+            for (const { vault, result } of results) {
+                if(result.positions.length > 0){
+                    for (const position of result.positions) {
+                        log.info("liquidation to execute on vault: " + vault.name + " position id: " + position.position_id)
+                        positionToLiquidate.push({vault: vault, id: position.position_id})
+                    }
                 }
             }
-        }
 
-        if(positionToLiquidate.length > 0){
-            let result = await liquidateBatchPosition(secretjs, signer.address, positionToLiquidate )
-            if(result){
-                if(result.code == 0){
-                    log.info("liquidation done :"+result.transactionHash )
+            if(positionToLiquidate.length > 0){
+                liquidationFlag=true
+                let result = await liquidateBatchPosition(secretjs, signer.address, positionToLiquidate )
+                if(result){
+                    if(result.code == 0){
+                        log.info("liquidation done :"+result.transactionHash )
 
-                    log.info("checking wallet balance :")
-                    log.info("===".repeat(10))
-                    for(let token of tokenList.tokens){
-                        let amount = await getUpdatedSecretBalance(secretjs, token, signer.address)
-                        log.info(token.name+" :"+amount )
-                        if(token.min_amount){
-                            if(amount >= token.min_amount){
-                                log.info(token.name+ " balance "+amount+" is >= min_amount "+token.min_amount)
-                                log.info("let swap "+token.name+" into SILK")
+                        log.info("checking wallet balance :")
+                        log.info("===".repeat(10))
+                        for(let token of tokenList.tokens){
+                            let amount = await getUpdatedSecretBalance(secretjs, token, signer.address)
+                            log.info(token.name+" :"+amount )
+                            if(token.min_amount){
+                                if(amount >= token.min_amount){
+                                    log.info(token.name+ " balance "+amount+" is >= min_amount "+token.min_amount)
+                                    log.info("let swap "+token.name+" into SILK")
 
-                                let routeList = getRouteList(token, silk)
-                                log.info("we find "+routeList.length+" route(s) to make the trade")
-                                let bestRoute = await simulateBestSwap(secretjs, routeList, amount, token, silk)
-                                if(bestRoute){
-                                    log.info("Starting Swap Broadcast")
-                                    let swapTx = await executeTrade(secretjs, bestRoute, token, amount)
-                                    if(swapTx){
-                                        log.info("Swap result:"+ (swapTx.code == TxResultCode.Success ? " Success" : " Ko") )
-                                        log.info("txHash:"+ swapTx.tx)
-                                        log.info("txHash:"+ swapTx.rawLog)
+                                    let routeList = getRouteList(token, silk)
+                                    log.info("we find "+routeList.length+" route(s) to make the trade")
+                                    let bestRoute = await simulateBestSwap(secretjs, routeList, amount, token, silk)
+                                    if(bestRoute){
+                                        log.info("Starting Swap Broadcast")
+                                        let swapTx = await executeTrade(secretjs, bestRoute, token, amount)
+                                        if(swapTx){
+                                            log.info("Swap result:"+ (swapTx.code == TxResultCode.Success ? " Success" : " Ko") )
+                                            log.info("txHash:"+ swapTx.tx)
+                                            log.info("txHash:"+ swapTx.rawLog)
+                                        }
                                     }
                                 }
                             }
+                            
                         }
-                        
                     }
                 }
+                liquidationFlag=false
             }
         }
     }
