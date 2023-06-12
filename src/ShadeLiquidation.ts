@@ -112,6 +112,13 @@ export async function liquidateBatchPosition(secretjs: SecretNetworkClient, send
             gasPriceInFeeDenom: Number(gasprice),
             feeDenom: "uscrt",
         })
+        if(resp.rawLog){
+            if(resp.rawLog.includes("failed to execute")){
+                const tx2 = await secretjs.query.getTx(resp.transactionHash);
+                log.info(tx2?.arrayLog);
+            }
+        }
+
         return resp
     }
     catch(e: any){
