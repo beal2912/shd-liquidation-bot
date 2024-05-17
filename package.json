@@ -4,9 +4,10 @@
   "description": "",
   "main": "build/index.js",
   "dependencies": {
-    "@cosmjs/cosmwasm-stargate": "^0.29.5",
-    "@cosmjs/proto-signing": "^0.29.5",
-    "@cosmjs/stargate": "^0.29.5",
+    "@cosmjs/cosmwasm-stargate": "^0.32.3",
+    "@cosmjs/crypto": "^0.32.3",
+    "@cosmjs/proto-signing": "^0.32.3",
+    "@cosmjs/stargate": "^0.32.3",
     "@types/ws": "^8.5.4",
     "bignumber.js": "^9.1.0",
     "bip39": "^3.0.4",
