@@ -109,16 +109,17 @@ export async function liquidateBatchPosition(secretjs: SecretNetworkClient, send
             })
             msgList.push(msg)
         }
-        
+        log.info("Starting broadcast liquidateBatchPosition")
         let resp = await secretjs.tx.broadcast(msgList, {
             gasLimit: 750_000 * msgList.length,
             gasPriceInFeeDenom: Number(gasprice),
             feeDenom: "uscrt",
         })
         if(resp.rawLog){
-            if(resp.rawLog.includes("failed to execute")){
-                const tx2 = await secretjs.query.getTx(resp.transactionHash);
-                log.info(tx2?.arrayLog);
+            log.info(resp.rawLog)
+                        if(resp.rawLog.includes("failed to execute")){
+                const tx2 = await secretjs.query.getTx(resp.transactionHash)
+                log.info(tx2?.arrayLog)
             }
         }
 
