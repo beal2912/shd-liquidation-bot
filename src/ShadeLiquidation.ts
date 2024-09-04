@@ -90,7 +90,7 @@ export async function liquidatePosition(secretjs: SecretNetworkClient, sender: s
     }
 }
 
-export async function liquidateBatchPosition(secretjs: SecretNetworkClient, sender: string, batch: Position[] ):Promise<TxResponse|undefined>{
+export async function liquidateBatchPosition(secretjs: SecretNetworkClient, sender: string, batch: Position[], customGasLimit: number = 500_000  ):Promise<TxResponse|undefined>{
     try{
 
         let msgList: any[] = []
@@ -111,15 +111,20 @@ export async function liquidateBatchPosition(secretjs: SecretNetworkClient, send
         }
         log.info("Starting broadcast liquidateBatchPosition")
         let resp = await secretjs.tx.broadcast(msgList, {
-            gasLimit: 500_000 + (500_000 * msgList.length),
+            gasLimit: customGasLimit + (500_000 * msgList.length),
             gasPriceInFeeDenom: Number(gasprice),
             feeDenom: "uscrt",
         })
         if(resp.rawLog){
             log.info(resp.rawLog)
-                        if(resp.rawLog.includes("failed to execute")){
+            if(resp.rawLog.includes("failed to execute")){
                 const tx2 = await secretjs.query.getTx(resp.transactionHash)
                 log.info(tx2?.arrayLog)
+            }
+            if(resp.rawLog.includes("out of gas")){
+                customGasLimit += 250_000
+                log.info("retry with: "+ customGasLimit )
+                return await liquidateBatchPosition(secretjs, sender, batch, customGasLimit)
             }
         }
 
