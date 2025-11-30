@@ -5,6 +5,10 @@ this typescript bot executes liquidations on Shade Lend then execute a swap on s
 It does not cost anything except SCRT gas to execute liquidations, and you receive 10% of the profits of all liquidations as a reward for liquidation risky positions and contributing to the security and decentralization of the protocol.
 
 ## Changelog
+- 2024-05-17:
+  - Rpc change + Websocket uri
+  - no position bug with BTC vault
+  - cosmjs packages update
 - 2023-06-08: 
   - Using websocket to resquest vaults once per block 
   - Resqueting the vault in parallel instead of sequentially

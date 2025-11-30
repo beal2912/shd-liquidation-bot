@@ -39,7 +39,8 @@ process.chdir(__dirname);
 
     var vaultList: Vault[] = []
 
-
+    log.info("Connecting to Secret Rpc..")
+    log.info("=======================================================")
     const signer = new SecretWallet( mnemonic ) 
     const secretjs = new SecretNetworkClient({
         url: lcd,
@@ -114,9 +115,15 @@ process.chdir(__dirname);
         if(!liquidationFlag){
             const promises = vaultList.map(async (vault) => {
                 let result = await queryVaultForLiquidation(secretjs, vault)
+                if(result && result.positions){
+                    log.info(vault.name + " -> " + (result.positions.length))
+                    return { vault, result }
+                }
+                else{
+                    log.info(vault.name + " - no position ")
+                    return { vault, result: { positions:[]} }
+                }
                 
-                log.info(vault.name + " -> " + result.positions.length)
-                return { vault, result }
             })
             const results = await Promise.all(promises)
 
@@ -192,7 +199,7 @@ process.chdir(__dirname);
     
     async function initWs(){
 
-        ws =  new WebSocket("wss://rpc.secret.express/websocket")
+        ws =  new WebSocket("wss://rpc.mainnet.secretsaturn.net/websocket")
         ws.onopen = onOpen
         ws.onclose = onClose
         ws.onmessage = onMessage

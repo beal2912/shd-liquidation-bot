@@ -2,6 +2,7 @@ import { MsgExecuteContract, SecretNetworkClient, TxResponse } from "secretjs";
 import { Wallet as SecretWallet } from 'secretjs';
 import { log } from "./botlib/Logger"
 import { Error } from "./botlib/Error";
+import { delay } from "./botlib/utils";
 
 
 require('dotenv').config();
@@ -40,6 +41,7 @@ export async function queryVaultForLiquidation(secretjs: SecretNetworkClient,vau
         let error = new Error(e)
         if(error.isKo() || error.isNotSure()){
             log.info("Rpc Error or timeout, let's retry the liquidation ")
+            await delay(5000)
             return await queryVaultForLiquidation(secretjs,vault)
         }
         else{
@@ -67,7 +69,7 @@ export async function liquidatePosition(secretjs: SecretNetworkClient, sender: s
             },
         })
         let resp = await secretjs.tx.broadcast([msg], {
-            gasLimit: 750_000,
+            gasLimit: 1_000_000,
             gasPriceInFeeDenom: Number(gasprice),
             feeDenom: "uscrt",
         })
@@ -78,6 +80,7 @@ export async function liquidatePosition(secretjs: SecretNetworkClient, sender: s
         let error = new Error(e)
         if(error.isKo() || error.isNotSure()){
             log.info("Rpc Error or timeout, let's retry the liquidation ")
+            await delay(5000)
             return await liquidatePosition(secretjs, sender, vault, positionId)
         }
         else{
@@ -87,7 +90,7 @@ export async function liquidatePosition(secretjs: SecretNetworkClient, sender: s
     }
 }
 
-export async function liquidateBatchPosition(secretjs: SecretNetworkClient, sender: string, batch: Position[] ):Promise<TxResponse|undefined>{
+export async function liquidateBatchPosition(secretjs: SecretNetworkClient, sender: string, batch: Position[], customGasLimit: number = 500_000  ):Promise<TxResponse|undefined>{
     try{
 
         let msgList: any[] = []
@@ -106,16 +109,22 @@ export async function liquidateBatchPosition(secretjs: SecretNetworkClient, send
             })
             msgList.push(msg)
         }
-        
+        log.info("Starting broadcast liquidateBatchPosition")
         let resp = await secretjs.tx.broadcast(msgList, {
-            gasLimit: 750_000 * msgList.length,
+            gasLimit: customGasLimit + (500_000 * msgList.length),
             gasPriceInFeeDenom: Number(gasprice),
             feeDenom: "uscrt",
         })
         if(resp.rawLog){
+            log.info(resp.rawLog)
             if(resp.rawLog.includes("failed to execute")){
-                const tx2 = await secretjs.query.getTx(resp.transactionHash);
-                log.info(tx2?.arrayLog);
+                const tx2 = await secretjs.query.getTx(resp.transactionHash)
+                log.info(tx2?.arrayLog)
+            }
+            if(resp.rawLog.includes("out of gas")){
+                customGasLimit += 250_000
+                log.info("retry with: "+ customGasLimit )
+                return await liquidateBatchPosition(secretjs, sender, batch, customGasLimit)
             }
         }
 
@@ -126,6 +135,7 @@ export async function liquidateBatchPosition(secretjs: SecretNetworkClient, send
         let error = new Error(e)
         if(error.isKo() || error.isNotSure()){
             log.info("Rpc Error or timeout, let's retry the liquidation ")
+            await delay(5000)
             return await liquidateBatchPosition(secretjs, sender, batch)
         }
         else{
