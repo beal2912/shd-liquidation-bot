@@ -1,11 +1,12 @@
 import { MsgExecuteContract, SecretNetworkClient, TxResponse } from "secretjs";
 import { Wallet as SecretWallet } from 'secretjs';
-import { log } from "./botlib/Logger"
-import { Error } from "./botlib/Error";
-import { delay } from "./botlib/utils";
+import { log } from "./botlib/Logger.js"
+import { Error } from "./botlib/Error.js";
+import { delay } from "./botlib/utils.js";
 
 
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 export interface Vault{
     id: string,
@@ -41,7 +42,7 @@ export async function queryVaultForLiquidation(secretjs: SecretNetworkClient,vau
         let error = new Error(e)
         if(error.isKo() || error.isNotSure()){
             log.info("Rpc Error or timeout, let's retry the liquidation ")
-            await delay(5000)
+            await delay(15000)
             return await queryVaultForLiquidation(secretjs,vault)
         }
         else{
@@ -69,7 +70,7 @@ export async function liquidatePosition(secretjs: SecretNetworkClient, sender: s
             },
         })
         let resp = await secretjs.tx.broadcast([msg], {
-            gasLimit: 1_000_000,
+            gasLimit: 2_000_000,
             gasPriceInFeeDenom: Number(gasprice),
             feeDenom: "uscrt",
         })
@@ -80,7 +81,7 @@ export async function liquidatePosition(secretjs: SecretNetworkClient, sender: s
         let error = new Error(e)
         if(error.isKo() || error.isNotSure()){
             log.info("Rpc Error or timeout, let's retry the liquidation ")
-            await delay(5000)
+            await delay(15000)
             return await liquidatePosition(secretjs, sender, vault, positionId)
         }
         else{
@@ -111,7 +112,7 @@ export async function liquidateBatchPosition(secretjs: SecretNetworkClient, send
         }
         log.info("Starting broadcast liquidateBatchPosition")
         let resp = await secretjs.tx.broadcast(msgList, {
-            gasLimit: customGasLimit + (500_000 * msgList.length),
+            gasLimit: customGasLimit + (900_000 * msgList.length),
             gasPriceInFeeDenom: Number(gasprice),
             feeDenom: "uscrt",
         })
@@ -122,7 +123,7 @@ export async function liquidateBatchPosition(secretjs: SecretNetworkClient, send
                 log.info(tx2?.arrayLog)
             }
             if(resp.rawLog.includes("out of gas")){
-                customGasLimit += 250_000
+                customGasLimit += 550_000
                 log.info("retry with: "+ customGasLimit )
                 return await liquidateBatchPosition(secretjs, sender, batch, customGasLimit)
             }
@@ -135,7 +136,7 @@ export async function liquidateBatchPosition(secretjs: SecretNetworkClient, send
         let error = new Error(e)
         if(error.isKo() || error.isNotSure()){
             log.info("Rpc Error or timeout, let's retry the liquidation ")
-            await delay(5000)
+            await delay(15000)
             return await liquidateBatchPosition(secretjs, sender, batch)
         }
         else{

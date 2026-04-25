@@ -1,18 +1,19 @@
 import { MsgExecuteContract, SecretNetworkClient, TxResultCode } from "secretjs";
 import { Wallet as SecretWallet } from 'secretjs';
 
-import { delay } from "./botlib/utils";
-import { log } from "./botlib/Logger";
+import { delay } from "./botlib/utils.js";
+import { log } from "./botlib/Logger.js";
 
 import * as BIP39 from "bip39";
 import { WebSocket } from "ws";
-import { Position, Vault, liquidateBatchPosition, liquidatePosition, queryVaultForLiquidation } from "./ShadeLiquidation";
-import { Token, getPublicBalance, getUpdatedSecretBalance } from "./SecretWallet";
-import { executeTrade, getRouteList, simulateBestSwap } from "./SecretTrade";
+import { Position, Vault, liquidateBatchPosition, liquidatePosition, queryVaultForLiquidation } from "./ShadeLiquidation.js";
+import { Token, getPublicBalance, getUpdatedSecretBalance } from "./SecretWallet.js";
+import { executeTrade, getRouteList, simulateBestSwap } from "./SecretTrade.js";
 
+import dotenv from 'dotenv';
+dotenv.config();
 
-require('dotenv').config();
-process.chdir(__dirname);
+//process.chdir(__dirname);
 
 
 (async () => {
@@ -22,7 +23,7 @@ process.chdir(__dirname);
     var ws =  {} as WebSocket
     var liquidationFlag = false
 
-
+   
     log.info("Init loading Vaults..")
     log.info("=======================================================")
     const envVaults = process.env.VAULTS ?? ""
@@ -38,7 +39,7 @@ process.chdir(__dirname);
 
 
     var vaultList: Vault[] = []
-
+    
     log.info("Connecting to Secret Rpc..")
     log.info("=======================================================")
     const signer = new SecretWallet( mnemonic ) 
@@ -55,6 +56,7 @@ process.chdir(__dirname);
         let page = 1
         let totalPage = 1
         while(page <= totalPage){
+            await delay(5000)
             const result: any = await secretjs.query.compute.queryContract({
                 contract_address: contract.contract,
                 code_hash: contract.codehash,
@@ -81,7 +83,7 @@ process.chdir(__dirname);
 
     log.info("loading Vaults done !")
     log.info("=======================================================")
-
+    await delay(10000)
     let scrtBalance = await getPublicBalance(secretjs, 'uscrt', signer.address)
     log.info("Your address: "+signer.address)
     log.info("scrt: "+scrtBalance)
@@ -109,7 +111,7 @@ process.chdir(__dirname);
         connexionClosed=true
     };
     
-    var onMessage = async function(event: any) {
+    var onMessage = async function() {
         log.info("Checking for liquidation")
 
         if(!liquidationFlag){
@@ -154,7 +156,7 @@ process.chdir(__dirname);
                                     log.info(token.name+ " balance "+amount+" is >= min_amount "+token.min_amount)
                                     log.info("let swap "+token.name+" into SILK")
 
-                                    let routeList = getRouteList(token, silk)
+                                    /* let routeList = getRouteList(token, silk)
                                     log.info("we find "+routeList.length+" route(s) to make the trade")
                                     let bestRoute = await simulateBestSwap(secretjs, routeList, amount, token, silk)
                                     if(bestRoute){
@@ -165,7 +167,7 @@ process.chdir(__dirname);
                                             log.info("txHash:"+ swapTx.tx)
                                             log.info("txHash:"+ swapTx.rawLog)
                                         }
-                                    }
+                                    } */
                                 }
                             }
                             
@@ -185,11 +187,11 @@ process.chdir(__dirname);
     }
 
 
-    await initWs()
-    
+    //await initWs()
+    await onMessage()
     while(true){
         if(connexionClosed){
-            initWs()
+            //initWs()
             connexionClosed=false
         }
         await delay(6000)
@@ -197,9 +199,9 @@ process.chdir(__dirname);
     }
     
     
-    async function initWs(){
+/*     async function initWs(){
 
-        ws =  new WebSocket("wss://rpc.mainnet.secretsaturn.net/websocket")
+        ws =  new WebSocket("wss://rpc.lavenderfive.com:443/secretnetwork/websocket")
         ws.onopen = onOpen
         ws.onclose = onClose
         ws.onmessage = onMessage
@@ -211,7 +213,7 @@ process.chdir(__dirname);
         
         ws.send('{ "id": "1","method": "subscribe","params": {"query": "tm.event=\'NewBlock\'" } }')
 
-    }
+    } */
 
 
 

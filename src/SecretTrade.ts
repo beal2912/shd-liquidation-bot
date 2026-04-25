@@ -1,18 +1,18 @@
 import { MsgExecuteContract, SecretNetworkClient, TxResponse } from "secretjs";
-import { secretAllMarket } from "./SecretMarket";
-import { Token } from "./SecretWallet";
-import { Route } from "./botlib/Route";
-import { Trajet } from "./botlib/Trajet";
-import BigNumber from "bignumber.js";
-import { log } from "./botlib/Logger";
-import { MarketData } from "./botlib/Market";
+import { secretAllMarket } from "./SecretMarket.js";
+import { Token } from "./SecretWallet.js";
+import { Route } from "./botlib/Route.js";
+import { Trajet } from "./botlib/Trajet.js";
+import { BigNumber } from "bignumber.js";
+import { log } from "./botlib/Logger.js";
+import { MarketData } from "./botlib/Market.js";
 import { floor } from "lodash";
-import { Error } from "./botlib/Error";
-import { delay } from "./botlib/utils";
+import { Error } from "./botlib/Error.js";
+import { delay } from "./botlib/utils.js";
 
 
-
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 const gasprice = process.env.GASPRICE ?? "0.1"
 

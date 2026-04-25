@@ -1,4 +1,4 @@
-import { MarketData } from "./Market";
+import { MarketData } from "./Market.js";
 
 
 

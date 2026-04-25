@@ -1,8 +1,8 @@
 import { SecretNetworkClient } from "secretjs";
-import { log } from "./botlib/Logger";
-import BigNumber from "bignumber.js";
-import { delay } from "./botlib/utils";
-import { Error } from "./botlib/Error";
+import { log } from "./botlib/Logger.js";
+import { BigNumber}  from "bignumber.js";
+import { delay } from "./botlib/utils.js";
+import { Error } from "./botlib/Error.js";
 
 
 export interface Token{

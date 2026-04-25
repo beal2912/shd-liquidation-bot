@@ -1,8 +1,8 @@
 
-
-import { cloneDeep } from "lodash";
-import { MarketData } from "./Market";
-import { Route } from "./Route";
+import pkg from 'lodash';
+const { cloneDeep } = pkg;
+import { MarketData } from "./Market.js";
+import { Route } from "./Route.js";
 
 
 

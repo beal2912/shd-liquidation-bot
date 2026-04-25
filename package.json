@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "build/index.js",
+  "type": "module",
   "dependencies": {
     "@cosmjs/cosmwasm-stargate": "^0.32.3",
-    "@cosmjs/crypto": "^0.32.3",
     "@cosmjs/proto-signing": "^0.32.3",
     "@cosmjs/stargate": "^0.32.3",
     "@types/ws": "^8.5.4",
@@ -13,7 +13,7 @@
     "bip39": "^3.0.4",
     "dotenv": "^16.0.3",
     "lodash": "^4.17.21",
-    "secretjs": "^1.9.3",
+    "secretjs": "^1.21.2",
     "tslog": "^3.3.4",
     "ws": "^8.12.0"
   },

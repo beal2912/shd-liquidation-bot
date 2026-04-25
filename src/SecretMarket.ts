@@ -1,5 +1,5 @@
 
-import {  MarketData } from "./botlib/Market"
+import {  MarketData } from "./botlib/Market.js"
 
 
 
